@@ -8,3 +8,6 @@ __pycache__
 
 *-local.y*ml
 .env
+
+# Those are vsc files with requests
+*.requests

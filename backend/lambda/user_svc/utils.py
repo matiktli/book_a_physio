@@ -1,7 +1,8 @@
 from functools import wraps
 from flask import g, request, redirect, url_for
 from exception import HttpException
-
+import jwt
+import datetime
 
 """Decorator
 Checks if user is logged in
@@ -33,11 +34,9 @@ class ValidationUtils():
 """
 Jwt Token utilities
 """
-class TokenUtils():
+class TokenSvc():
 
     def __init__(self, secret_key, expiration_time_millis=60*60*1000):
-        import jwt
-        import datetime
         self.secret_key = secret_key
         self.expiration_time_millis = expiration_time_millis
 
@@ -49,8 +48,9 @@ class TokenUtils():
                 'sub': user_id
             }
             return jwt.encode(payload, self.secret_key, algorithm='HS256')
-        except Exception:
-            raise HttpException(500, 'Could not encode token')
+        except Exception as e:
+            print('Err: ', e)
+            raise HttpException(500, f'Could not encode token')
     
     def decode(self, token):
         try:

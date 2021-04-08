@@ -11,7 +11,7 @@ class UserService():
         user_list = self.user_dao.select()
         return [model_to_dict(u) for u in user_list]
 
-    def find_by_email(self, email):
+    def get_by_email(self, email):
         try:
             return model_to_dict(self.user_dao.get(self.user_dao.email == email))
         except DoesNotExist:

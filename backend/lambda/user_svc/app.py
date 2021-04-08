@@ -4,16 +4,19 @@ import utils as u
 from service import UserService
 import os
 
+
 app = Flask(__name__)
-token_utils = u.TokenUtils(os.getenv('SECRET_KEY'))
+token_svc = u.TokenSvc(os.getenv('SECRET_KEY'))
 user_svc = UserService()
 
+def j(s):
+    return s
 
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
     u.ValidationUtils.validate_required_fields(data, ['email', 'password'])
-    if user_svc.find_by_email(data['email']) is not None:
+    if user_svc.get_by_email(data['email']) is not None:
         raise HttpException(400, f"User with email: {data['email']} already exists")
     user = user_svc.create_user(data)
     return jsonify(user)
@@ -22,7 +25,15 @@ def register():
 def login():
     data = request.get_json()
     u.ValidationUtils.validate_required_fields(data, ['email', 'password'])
-    return jsonify(token='my-token-here')
+    user = user_svc.get_by_email(data['email'])
+    if user is None:
+        raise HttpException(404, f'User with email: {data["email"]} not found')
+    if user['password'] != data['password']:
+        print(f"Error in auth: {data['email']}. DB[{user['password']}] != JS[{data['password']}]")
+        raise HttpException(401, 'Passwords not matching')
+    result_token = token_svc.encode(user['user_id'])
+    print(f"[OK] -- Login as user id: {user['user_id']}, email: {user['email']}")
+    return jsonify(token=result_token)
 
 @app.route('/me', methods=['GET'])
 def get_curent_user():
