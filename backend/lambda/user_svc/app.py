@@ -9,10 +9,7 @@ app = Flask(__name__)
 token_svc = u.TokenSvc(os.getenv('SECRET_KEY'))
 user_svc = UserService()
 
-def j(s):
-    return s
-
-@app.route('/register', methods=['POST'])
+@app.route('/users/register', methods=['POST'])
 def register():
     data = request.get_json()
     u.ValidationUtils.validate_required_fields(data, ['email', 'password'])
@@ -21,7 +18,7 @@ def register():
     user = user_svc.create_user(data)
     return jsonify(user)
 
-@app.route('/login', methods=['POST'])
+@app.route('/users/login', methods=['POST'])
 def login():
     data = request.get_json()
     u.ValidationUtils.validate_required_fields(data, ['email', 'password'])
@@ -35,7 +32,8 @@ def login():
     print(f"[OK] -- Login as user id: {user['user_id']}, email: {user['email']}")
     return jsonify(token=result_token)
 
-@app.route('/me', methods=['GET'])
+@app.route('/users/me', methods=['GET'])
+@u.login_required
 def get_curent_user():
     return jsonify(user_svc.get_all_users())
 
