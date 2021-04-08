@@ -16,6 +16,12 @@ class UserService():
             return model_to_dict(self.user_dao.get(self.user_dao.email == email))
         except DoesNotExist:
             return None
+    
+    def get_by_id(self, user_id):
+        try:
+            return model_to_dict(self.user_dao.get(self.user_dao.user_id == user_id))
+        except DoesNotExist:
+            return None
 
     def create_user(self, user_data):
         try:

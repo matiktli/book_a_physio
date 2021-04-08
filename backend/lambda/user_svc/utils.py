@@ -7,13 +7,19 @@ import datetime
 """Decorator
 Checks if user is logged in
 """
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if g.user_id is None:
-            raise HttpException(400, 'You must be logged in')
-        return f(*args, **kwargs)
-    return decorated_function
+def login_required(token_svc):
+    def decorator(function):
+        def wrapper(*args, **kwargs):
+            if 'Authorization' not in request.headers:
+                raise HttpException(403, 'Please provide Authorization token')
+            token = request.headers['Authorization']
+            user_id = token_svc.decode(token)
+            if user_id is None:
+                raise HttpException(400, 'Could not decode token')
+            g.user_id = user_id
+            return function(*args, **kwargs)
+        return wrapper
+    return decorator
 
 """
 Validation utils, mighe be moved to separate file `validator.py`
@@ -49,14 +55,13 @@ class TokenSvc():
             }
             return jwt.encode(payload, self.secret_key, algorithm='HS256')
         except Exception as e:
-            print('Err: ', e)
             raise HttpException(500, f'Could not encode token')
     
     def decode(self, token):
         try:
-            payload = jwt.decode(token, self.secret_key)
+            payload = jwt.decode(token, self.secret_key, algorithms=['HS256'])
             return payload['sub']
         except jwt.ExpiredSignatureError:
             raise HttpException(401, 'Token expired')
         except jwt.InvalidTokenError:
-            return HttpException(401, 'Token invalid')
+            raise HttpException(401, 'Token invalid')

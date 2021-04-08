@@ -11,3 +11,6 @@ __pycache__
 
 # Those are vsc files with requests
 *.requests
+
+# Zappa generates zip for package
+*user-svc-dev-*.zip

@@ -33,9 +33,11 @@ def login():
     return jsonify(token=result_token)
 
 @app.route('/users/me', methods=['GET'])
-@u.login_required
+@u.login_required(token_svc)
 def get_curent_user():
-    return jsonify(user_svc.get_all_users())
+    print(f'Instance of: {g.user_id}')
+    user = user_svc.get_by_id(g.user_id)
+    return jsonify(user)
 
 @app.errorhandler(HttpException)
 def handle_bad_request(e):
