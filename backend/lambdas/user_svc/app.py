@@ -10,6 +10,14 @@ app = Flask(__name__)
 auth_util = u.AuthorizationUtils(os.getenv('SECRET_KEY'))
 user_svc = UserService()
 
+def __login(user_data):
+    user = user_svc.get_by_email(user_data['email'])
+    if user is None:
+        raise HttpException(401, f'User with email: {user_data["email"]} not found')
+    if user['password'] != user_data['password']:
+        raise HttpException(401, 'Passwords not matching')
+    return auth_util.encode(user['user_id'])
+
 @app.route('/users/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -17,7 +25,8 @@ def register():
     if user_svc.get_by_email(data['email']) is not None:
         raise HttpException(400, f"User with email: {data['email']} already exists")
     user = user_svc.create_user(data)
-    return jsonify(user)
+    token = __login(data)
+    return jsonify(user=user, token=token)
 
 @app.route('/users/authorize', methods=['GET'])
 def authorize():
@@ -31,13 +40,8 @@ def authorize():
 def login():
     data = request.get_json()
     u.ValidationUtils.validate_required_fields(data, ['email', 'password'])
-    user = user_svc.get_by_email(data['email'])
-    if user is None:
-        raise HttpException(401, f'User with email: {data["email"]} not found')
-    if user['password'] != data['password']:
-        raise HttpException(401, 'Passwords not matching')
-    result_token = auth_util.encode(user['user_id'])
-    return jsonify(token=result_token)
+    token = __login(data)
+    return jsonify(token=token)
 
 @app.route('/users/<user_id>', methods=['PUT'])
 @login_required
@@ -51,6 +55,8 @@ def update_user(user_id):
 @login_required
 def get_curent_user():
     user = user_svc.get_by_id(g.user_id)
+    if user == None:
+        raise HttpException(404)
     return jsonify(user)
 
 @app.errorhandler(HttpException)

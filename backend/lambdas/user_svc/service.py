@@ -27,7 +27,7 @@ class UserService():
         try:
             return model_to_dict(self.user_dao.create(email=user_data['email'], password=user_data['password']))
         except IntegrityError as e:
-            raise HttpException(400, f"Error while creating user with email: {user_data['email']}. {e}")
+            raise HttpException(400, f"Error while creating user with email: {user_data['email']}")
     
     def update_user(self, user_data):
         if 'id' not in user_data:

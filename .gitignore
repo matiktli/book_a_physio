@@ -13,4 +13,5 @@ __pycache__
 *.requests
 
 # Zappa generates zip for package
-*user-svc-dev-*.zip
+*-svc-dev-*.zip
+*-svc-prod-*.zip

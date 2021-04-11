@@ -11,10 +11,10 @@ class BaseModel(Model):
     class Meta:
         database = DATABASE
 
-class User(BaseModel):
-    user_id = AutoField()
-    email = CharField(unique=True, max_length=30)
-    password = CharField(max_length=30)
+class Gym(BaseModel):
+    gym_id = AutoField()
+    name = CharField(unique=True, max_length=30)
+    size = IntegerField(default=1)
 
 DATABASE.connect()
-DATABASE.create_tables([User])
+DATABASE.create_tables([Gym])
