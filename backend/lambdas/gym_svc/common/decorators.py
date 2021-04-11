@@ -15,7 +15,7 @@ def __do_auth_via_security_svc(token):
         return None
     return r.json()['user_id']
 
-def __authorize(request_obj, global_variables, auth_action='service'):
+def __authorize(request_obj, global_variables, auth_action='util'):
     if 'Authorization' not in request_obj.headers:
         raise HttpException(403, 'Please provide Authorization token')
     token = request_obj.headers['Authorization']
