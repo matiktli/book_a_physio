@@ -1,0 +1,13 @@
+{
+  "dev": {
+    "app_function": "app.app",
+    "profile_name": "zappa",
+    "project_name": "gym-svc",
+    "runtime": "python3.7",
+    "s3_bucket": "zappa-gym-svc",
+    "keep_warm": false,
+    "environment_variables": {
+      "USER_SVC_PATH": "https://iek0voabj2.execute-api.eu-west-2.amazonaws.com/dev"
+    }
+  }
+}

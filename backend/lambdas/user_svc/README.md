@@ -1,8 +1,11 @@
 # User Service
+
 User and Security Service basically
+
 ## Endpoints
 
 ### Register
+
 ```
 POST .../users/register
 content-type: application/json
@@ -13,6 +16,7 @@ content-type: application/json
 ```
 
 ### Login
+
 ```
 POST .../users/login
 content-type: application/json
@@ -22,7 +26,14 @@ content-type: application/json
 }
 ```
 
+### Authorize Token
+
+```
+GET .../users/authorize?token=<token>
+```
+
 ### Curent User
+
 ```
 POST .../users/me
 Authorization: <token from login>

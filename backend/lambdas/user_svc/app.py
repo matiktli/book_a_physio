@@ -1,12 +1,13 @@
 from flask import Flask, jsonify, request, g
-from exception import HttpException
-import utils as u
+from common.exceptions import HttpException
+from common.decorators import login_required
+import common.utils as u
 from service import UserService
 import os
 
 
 app = Flask(__name__)
-token_svc = u.TokenSvc(os.getenv('SECRET_KEY'))
+auth_util = u.AuthorizationUtils(os.getenv('SECRET_KEY'))
 user_svc = UserService()
 
 @app.route('/users/register', methods=['POST'])
@@ -18,24 +19,37 @@ def register():
     user = user_svc.create_user(data)
     return jsonify(user)
 
+@app.route('/users/authorize', methods=['GET'])
+def authorize():
+    u.ValidationUtils.validate_required_fields(request.args, ['token'])
+    token = request.args.get('token')
+    user_id = auth_util.decode(token)
+    user = user_svc.get_by_id(user_id)
+    return jsonify(user)
+
 @app.route('/users/login', methods=['POST'])
 def login():
     data = request.get_json()
     u.ValidationUtils.validate_required_fields(data, ['email', 'password'])
     user = user_svc.get_by_email(data['email'])
     if user is None:
-        raise HttpException(404, f'User with email: {data["email"]} not found')
+        raise HttpException(401, f'User with email: {data["email"]} not found')
     if user['password'] != data['password']:
-        print(f"Error in auth: {data['email']}. DB[{user['password']}] != JS[{data['password']}]")
         raise HttpException(401, 'Passwords not matching')
-    result_token = token_svc.encode(user['user_id'])
-    print(f"[OK] -- Login as user id: {user['user_id']}, email: {user['email']}")
+    result_token = auth_util.encode(user['user_id'])
     return jsonify(token=result_token)
 
+@app.route('/users/<user_id>', methods=['PUT'])
+@login_required
+def update_user(user_id):
+    data = request.get_json()
+    u.ValidationUtils.validate_required_fields(data, ['id'])
+    updated_user = user_svc.update_user(data)
+    return jsonify(updated_user)
+
 @app.route('/users/me', methods=['GET'])
-@u.login_required(token_svc)
+@login_required
 def get_curent_user():
-    print(f'Instance of: {g.user_id}')
     user = user_svc.get_by_id(g.user_id)
     return jsonify(user)
 

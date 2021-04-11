@@ -1,4 +1,4 @@
-from exception import HttpException
+from common.exceptions import HttpException
 from dao import User
 from peewee import DoesNotExist, IntegrityError
 from playhouse.shortcuts import model_to_dict, dict_to_model
@@ -32,3 +32,4 @@ class UserService():
     def update_user(self, user_data):
         if 'id' not in user_data:
             raise HttpException(400, 'Could not update user without id provided')
+        raise HttpException(501, 'Not implemented')
