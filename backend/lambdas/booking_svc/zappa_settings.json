@@ -2,14 +2,13 @@
   "dev": {
     "app_function": "app.app",
     "profile_name": "zappa",
-    "project_name": "booking-svc",
+    "project_name": "gym-svc",
     "runtime": "python3.7",
-    "s3_bucket": "zappa-booking-svc",
+    "s3_bucket": "zappa-gym-svc",
     "keep_warm": false,
     "environment_variables": {
       "DB_HOST": "book-a-physio-dev.chuvmn3dwyq9.eu-west-2.rds.amazonaws.com",
-      "USER_SVC_PATH": "https://iek0voabj2.execute-api.eu-west-2.amazonaws.com/dev",
-      "GYM_SVC_PATH": "https://iek0voabj2.execute-api.eu-west-2.amazonaws.com/dev"
+      "USER_SVC_PATH": "https://twdfpghvm1.execute-api.eu-west-2.amazonaws.com/dev"
     }
   }
 }
